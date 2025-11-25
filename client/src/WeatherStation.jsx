@@ -181,8 +181,9 @@ const ValueDisplay = ({ value, unit, subtext, colorClass = "" }) => (
 
 const calculateHeatIndex = (temp, humidity) => {
   const T = parseFloat(temp);
-  if (T < 26) return T; // La fórmula solo funciona bien con calor
-  return (T + 0.5555 * ((6.11 * Math.exp(5417.7530 * ((1/273.16) - (1/(273.15 + T))))) - 10)).toFixed(1);
+  const H = parseFloat(humidity);
+  if (T < 26 && H > 60) return T; // La fórmula solo funciona bien con calor
+  return (-8.784+1.611*T+2.34*H-0.146*T*H).toFixed(1);
 };
 
 export default function WeatherStation() {
@@ -236,10 +237,10 @@ export default function WeatherStation() {
   };
 
   const processData = (feed) => {
-    const t = parseFloat(feed.field1 || 0); // Asumiendo Temp
-    const h = parseFloat(feed.field2 || 0); // Asumiendo Humedad
-    const l = parseFloat(feed.field3 || 0); // Asumiendo Luz
-    const s = parseFloat(feed.field4 || 0); // Asumiendo Sonido
+    const h = parseFloat(feed.field1 || 0); // Humedad
+    const t = parseFloat(feed.field2 || 0); // Temp
+    const s = parseFloat(feed.field3 || 0); // Sonido
+    const l = parseFloat(feed.field4 || 0); // Luz
 
     // Tendencia Luz
     if (l > data.light + 5) setLightTrend('up');
